@@ -1,12 +1,36 @@
 package risrchanish.product.recommend.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinColumns;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name="product_features")
 public class ProductFeature {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long featureId;
+	
+	@ManyToOne
+	@JoinColumn(name = "product_id")
 	private Product product;
-	private List<Double> featureVector;
+	
+	@ElementCollection
+	@CollectionTable(name = "feature_vectors", joinColumns = @JoinColumn(name = "feature_id"))
+	@Column(name = "value")
+	private List<Double> featureVector = new ArrayList<>();
 	
 	 public ProductFeature()
 	{
@@ -31,7 +55,7 @@ public class ProductFeature {
 		return featureId;
 	}
 
-//	public void setProduct_id(Long product_id) {
+//	public void setid(Long product_id) {
 //		this.product_id = product_id;
 //	}
 	

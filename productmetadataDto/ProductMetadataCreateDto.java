@@ -16,6 +16,11 @@ public class ProductMetadataCreateDto {
 	
 //	@NotBlank(message = "Material is required")
 	private String material;
+	
+	private Double maxPrice;
+	
+	private Double minPrice;
+	
 	private List<String> tags;
 	private Map<String, String> additionalAttributes;
 
@@ -33,6 +38,27 @@ public class ProductMetadataCreateDto {
 		this.material = material;
 		this.tags = tags;
 		this.additionalAttributes = additionalAttributes;
+	}
+
+
+	
+	public Double getMaxPrice() {
+		return maxPrice;
+	}
+
+
+	public void setMaxPrice(Double maxPrice) {
+		this.maxPrice = maxPrice;
+	}
+
+
+	public Double getMinPrice() {
+		return minPrice;
+	}
+
+
+	public void setMinPrice(Double minPrice) {
+		this.minPrice = minPrice;
 	}
 
 

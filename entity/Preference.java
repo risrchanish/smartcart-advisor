@@ -22,6 +22,9 @@ public class Preference {
 	@JoinColumn(name="user_id")
 	private User user;
 	
+	// No arg constructor
+	public Preference()
+	{}
 	
 
 	public Preference(String name, User user) {
@@ -41,9 +44,9 @@ public class Preference {
 		return preferenceId;
 	}
 
-//	public void setPreferenceId(Long preferenceId) {
-//		this.preferenceId = preferenceId;
-//	}
+	public void setPreferenceId(Long preferenceId) {
+		this.preferenceId = preferenceId;
+	}
 
 	public String getName() {
 		return name;

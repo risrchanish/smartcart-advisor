@@ -16,6 +16,11 @@ public class RatingCreateDto {
 //	@NotNull(message = "Timestamp is required")
 	private LocalDateTime timestamp;
 	
+//	@NotNull(message = "User id is required")
+	private Long userId;
+
+//	@NotNull(message = "Product id is required")	
+	private Long productId;
 	
 	public RatingCreateDto()
 	{}
@@ -67,6 +72,27 @@ public class RatingCreateDto {
 
 	public void setTimestamp(LocalDateTime timestamp) {
 		this.timestamp = timestamp;
+	}
+
+
+	public Long getUserId() {
+		return userId;
+	}
+
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+
+
+	
+	public Long getProductId() {
+		return productId;
+	}
+
+
+	public void setProductId(Long productId) {
+		this.productId = productId;
 	}
 
 

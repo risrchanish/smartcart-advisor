@@ -1,5 +1,6 @@
 package risrchanish.product.recommend.entity;
 
+
 import java.util.List;
 import java.util.Map;
 
@@ -9,7 +10,11 @@ public class ProductSearchCriteria {
 
 	private List<String> categories;
 	private Map<String, String> metadata;
+	
+//	@Min(value = 0, message = "Minimum price must not be negative")
 	private Double minPrice;
+	
+//	@Min(value = 0, message = "Minimum price must not be negative")
 	private Double maxPrice;
 	private String nameKeyword;
 	private List<String> brands;

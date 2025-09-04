@@ -1,22 +1,23 @@
 package risrchanish.product.recommend.service;
 
-import java.util.List;
+
 import java.util.Map;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+
 
 import risrchanish.product.recommend.dto.product.ProductCreateDto;
 import risrchanish.product.recommend.dto.product.ProductResponseDto;
 import risrchanish.product.recommend.dto.product.ProductUpdateDto;
+import risrchanish.product.recommend.entity.Product;
 
 
 public interface ProductService {
 
 	ProductResponseDto createProduct(ProductCreateDto dto);
 	
-	ProductResponseDto updateProduct(ProductUpdateDto dto);
+	ProductResponseDto updateProduct(Long productId, ProductUpdateDto dto);
 	
 	ProductResponseDto getProductById(Long productId);
 	
@@ -26,13 +27,13 @@ public interface ProductService {
 	
 	Page<ProductResponseDto> searchProductsByName(String name, Pageable pageable);
 	
-	boolean deleteProduct(Long productId);
+	void deleteProduct(Long productId);
 	
 	Page<ProductResponseDto> filterProductsByMetadata(Map<String,String> filters, Pageable pageable);
 	
-	Double calculateDiscountedPrice(Long productId);
+	Double calculateDiscountedPrice(Product product);
 	
-	List<ProductResponseDto> getAllProductsSorted(Sort sort);
+	Page<ProductResponseDto> getAllProductsSortedByName(Pageable pageable);
 	
 	Page<ProductResponseDto> getProductByPriceRange(Double minPrice, Double maxPrice, Pageable pageable);
 	

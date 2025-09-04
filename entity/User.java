@@ -1,5 +1,6 @@
 package risrchanish.product.recommend.entity;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,7 +27,7 @@ public class User {
 	private String location;
 	
 	@OneToMany(mappedBy = "user", cascade= CascadeType.ALL, orphanRemoval = true)
-	private List<Preference> preferences;
+	private List<Preference> preferences = new ArrayList<>();
 	
 	// No argument constructor
 	public User() {

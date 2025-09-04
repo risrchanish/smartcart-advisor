@@ -1,21 +1,53 @@
 package risrchanish.product.recommend.entity;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.data.domain.Sort;
 
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.MapKeyColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "product_metadata")
 public class ProductMetadata {
 
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long metadataId;
+	
 	private String brand;
 	private String color;
 	private String size;
 	private String material;
 	private Double minPrice;
 	private Double maxPrice;
-	private List<String> tags;
-	private Map<String, String> additionalAttributes;
+	
+	@OneToOne(mappedBy = "metadata")
+	private Product product;
+	
+	@ElementCollection
+	@CollectionTable(name = "metadata_tags", joinColumns = @JoinColumn(name = "metadata_id"))
+	@Column(name = "tag")
+	private List<String> tags = new ArrayList<>();
+	
+
+	@ElementCollection
+	@CollectionTable(name = "metadata_attributes", joinColumns = @JoinColumn(name = "metadata_id"))
+	@MapKeyColumn(name = "attribute_key")
+	@Column(name = "attribute_value")
+	private Map<String, String> additionalAttributes = new HashMap<>();
 	
 	
 	public ProductMetadata()
@@ -146,6 +178,17 @@ public class ProductMetadata {
 	}
 
 
+	public Product getProduct() {
+		return product;
+	}
+
+
+
+	public void setProduct(Product product) {
+		this.product = product;
+	}
+
+
 
 	@Override
 	public String toString() {
@@ -153,6 +196,13 @@ public class ProductMetadata {
 				+ ", material=" + material + ", minPrice=" + minPrice + ", maxPrice=" + maxPrice + ", tags=" + tags
 				+ ", additionalAttributes=" + additionalAttributes + "]";
 	}
+	
+	/*
+	 * 	@ElementCollection
+	@CollectionTable(name = "metadata_attributes", joinColumns = @JoinColumn(name = "metadata_id"))
+	@MapKeyColumn(name = "attribute_key")
+	@Column(name = "attribute_value")
+	 */
 	
 	
 }

@@ -26,6 +26,7 @@ public class Rating {
 	@JoinColumn(name = "product_id")
 	private Product product;
 	
+	
 	private double rating;
 	private String reviewText;
 	private boolean isVerified;
@@ -79,10 +80,10 @@ public class Rating {
 	}
 
 
-//	public void setProductId(Long productId) {
-//		this.productId = productId;
-//	}
-//
+	public void setProduct(Product product) {
+		this.product = product;
+	}
+
 
 	public boolean isVerified() {
 		return isVerified;
@@ -126,6 +127,10 @@ public class Rating {
 	}
 
 
+
+	public void setUser(User user) {
+		this.user = user;
+	}
 
 	@Override
 	public String toString() {

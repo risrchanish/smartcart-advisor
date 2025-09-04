@@ -1,5 +1,6 @@
 package risrchanish.product.recommend.entity;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -34,10 +35,10 @@ public class Product {
 	private boolean inStock;
 	
 	@OneToMany(mappedBy = "product",cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Rating> ratings;
+	private List<Rating> ratings = new ArrayList<>();
 	
 	@OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<ProductFeature> features; 
+	private List<ProductFeature> features = new ArrayList<>(); 
 
 
 	public Product()
@@ -50,31 +51,27 @@ public class Product {
 	
 	// Product Id excluded
 	
-	public Product(String name, String category, ProductMetadata metadata, double price,
-			boolean inStock, List<Rating> ratings, List<ProductFeature> features) {
+	public Product(String name, String category, double price,
+			boolean inStock) {
 
 		this.name = name;
 		this.category = category;
-		this.metadata = metadata;
 		this.price = price;
 		this.inStock = inStock;
-		this.ratings = ratings;
-		this.features = features;
+		
 	}
 
 
 	// All arg constructor
-	public Product(Long productId, String name, String category, ProductMetadata metadata, double price,
-			boolean inStock, List<Rating> ratings, List<ProductFeature> features) {
+	public Product(Long productId, String name, String category, double price,
+			boolean inStock) {
 
 		this.productId = productId;
 		this.name = name;
 		this.category = category;
-		this.metadata = metadata;
 		this.price = price;
 		this.inStock = inStock;
-		this.ratings = ratings;
-		this.features = features;
+
 	}
 
 	public String getName() {
@@ -133,9 +130,9 @@ public class Product {
 		this.features = features;
 	}
 	
-//	public void setProductId(Long productId) {
-//	this.productId = productId;
-//}
+	public void setProductId(Long productId) {
+	this.productId = productId;
+}
 
 
 	@Override

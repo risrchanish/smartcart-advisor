@@ -1,6 +1,11 @@
 package risrchanish.product.recommend.dto.product;
 
-import java.util.Map;
+import java.util.List;
+
+	
+import risrchanish.product.recommend.dto.productfeature.ProductFeatureResponseDto;
+import risrchanish.product.recommend.dto.productmetadata.ProductMetadataResponseDto;
+import risrchanish.product.recommend.dto.rating.RatingResponseDto;
 
 public record ProductResponseDto(
 		
@@ -9,7 +14,9 @@ public record ProductResponseDto(
 		Double price,
 		String category,
 		Double discountedPrice, // computed in service
-		Map<String, String> metadata,  // For ML filtering 
-		boolean inStock
+		ProductMetadataResponseDto metadata,  // For ML filtering or can be written as 
+		boolean inStock,
+		List<RatingResponseDto> ratings,	
+		List<ProductFeatureResponseDto> featureVector
 		
 		) {}

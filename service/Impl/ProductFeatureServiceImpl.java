@@ -1,5 +1,11 @@
 package risrchanish.product.recommend.service.Impl;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -7,54 +13,155 @@ import org.springframework.stereotype.Service;
 import risrchanish.product.recommend.dto.productfeature.ProductFeatureCreateDto;
 import risrchanish.product.recommend.dto.productfeature.ProductFeatureResponseDto;
 import risrchanish.product.recommend.dto.productfeature.ProductFeatureUpdateDto;
+import risrchanish.product.recommend.entity.Product;
+import risrchanish.product.recommend.entity.ProductFeature;
+import risrchanish.product.recommend.exception.ResourceNotFoundException;
+import risrchanish.product.recommend.mapper.ProductFeatureMapper;
 import risrchanish.product.recommend.repository.ProductFeatureRepository;
+import risrchanish.product.recommend.repository.ProductRepository;
 import risrchanish.product.recommend.service.ProductFeatureService;
 
 @Service
 public class ProductFeatureServiceImpl implements ProductFeatureService{
 	
 	private ProductFeatureRepository productFeatureRepository;
+	private ProductRepository productRepository; 
+	
+	public ProductFeatureServiceImpl(ProductFeatureRepository productFeatureRepository, ProductRepository productRepository)
+	{
+		this.productFeatureRepository = productFeatureRepository;
+		this.productRepository = productRepository;
+	}
+	
+	// Creating Product Feature
 
 	@Override
 	public ProductFeatureResponseDto createProductFeature(ProductFeatureCreateDto dto) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		Product product = productRepository.findById(dto.getProductId())
+							.orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+		
+		ProductFeature feature = ProductFeatureMapper.toProductFeature(dto, product);
+		
+		productFeatureRepository.save(feature);
+		
+		return ProductFeatureMapper.toFeatureResponseDto(feature);
 	}
+	
+	
+	// Updating product feature
 
 	@Override
 	public ProductFeatureResponseDto updateProductFeature(Long featureId, ProductFeatureUpdateDto dto) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		if(featureId == null)
+		{
+			throw new IllegalArgumentException("Feature Id must not be null");
+		}
+		
+		ProductFeature feature = productFeatureRepository.findById(featureId)
+									.orElseThrow(() -> new ResourceNotFoundException("Product feature not found"));
+		
+		if(dto.getProductId() == null)
+		{
+			throw new ResourceNotFoundException("Id must not be null");
+		}
+		
+		Product product = productRepository.findById(dto.getProductId())
+							.orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+		
+		ProductFeature updatedFeature = ProductFeatureMapper.toUpdateProductFeature(feature, dto, product); 
+		
+		productFeatureRepository.save(updatedFeature); // saving the updated feature
+		
+		return ProductFeatureMapper.toFeatureResponseDto(updatedFeature);
 	}
 
+	// find product feature with Id
+	
 	@Override
 	public ProductFeatureResponseDto getProductFeaturesById(Long featureId) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		if(featureId == null)
+		{
+			throw new IllegalArgumentException("Feature Id must not be null");
+		}
+		ProductFeature feature = productFeatureRepository.findById(featureId)
+									.orElseThrow(() -> new ResourceNotFoundException("Product feature not found"));
+		return ProductFeatureMapper.toFeatureResponseDto(feature);
 	}
+	
+	// Find the product feature
 
 	@Override
 	public ProductFeatureResponseDto getProductFeaturesByProductId(Long productId) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		if(productId == null)
+		{
+			throw new IllegalArgumentException("Product Id must not be null");
+		}
+		
+		ProductFeature feature = Optional.ofNullable(productFeatureRepository.findByProduct_ProductId(productId))
+									.orElseThrow(() -> new ResourceNotFoundException("Feature not found"));
+		
+		return ProductFeatureMapper.toFeatureResponseDto(feature);
+		
 	}
 
 	@Override
 	public Page<ProductFeatureResponseDto> getAllProductFeaturesByProductId(Long productId, Pageable pageable) {
-		// TODO Auto-generated method stub
-		return null;
+		
+		if(productId == null)
+		{
+			throw new IllegalArgumentException("Product Id not found");
+		}
+		
+		Page<ProductFeature> features = productFeatureRepository.findByProduct_ProductId(productId, pageable);
+		
+		if(features.isEmpty())
+		{
+			return Page.empty(pageable);
+		}
+		
+		return features.map(feature -> 	new ProductFeatureResponseDto(feature.getFeatureId(),
+												feature.getProduct().getProductId(),
+												Optional.ofNullable(feature.getFeatureVector())
+												.orElse(Collections.emptyList())));
 	}
 
+	// getting all product features
+	
 	@Override
 	public Page<ProductFeatureResponseDto> getAllProductFeatures(Pageable pageable) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+		
+		Page<ProductFeature> features = productFeatureRepository.findAll(pageable);
+		
+		if(features.isEmpty())
+		{
+			return Page.empty(pageable);
+		}
+		
+
+		    return features.map(feature -> new ProductFeatureResponseDto(
+		        feature.getFeatureId(),
+		        feature.getProduct().getProductId(),
+		        Optional.ofNullable(feature.getFeatureVector()).orElse(Collections.emptyList())));
+		}	
+	
+	// Delete feature by Id
 
 	@Override
 	public void deleteProductFeatureById(Long featureId) {
-		// TODO Auto-generated method stub
 		
+		if(featureId == null)
+		{
+			throw new IllegalArgumentException("Feature Id not found");
+		}
+		
+		ProductFeature feature = productFeatureRepository.findById(featureId)
+									.orElseThrow(() -> new ResourceNotFoundException("Feature not found"));
+		
+		productFeatureRepository.delete(feature);
 	}
 
 }

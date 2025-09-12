@@ -16,6 +16,6 @@ public interface PreferenceRepository extends JpaRepository<Preference, Long>{
 	    Page<Preference> findByNameContainingIgnoreCase(String name, Pageable pageable);
 
 	    @Query("SELECT p FROM Preference p WHERE p.user.userId = :userId")
-	    Page<Preference> findByUserId(@Param("userId") Long userId, Pageable pageable);	
+	    Page<Preference> findByUser_UserId(@Param("userId") Long userId, Pageable pageable);	
 
 }

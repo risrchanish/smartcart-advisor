@@ -16,8 +16,6 @@ public interface ProductFeatureService {
 	ProductFeatureResponseDto getProductFeaturesById(Long featureId);
 	
 	ProductFeatureResponseDto getProductFeaturesByProductId(Long productId);
-		
-	Page<ProductFeatureResponseDto> getAllProductFeaturesByProductId(Long productId, Pageable pageable);
 	
 	Page<ProductFeatureResponseDto> getAllProductFeatures(Pageable pageable);
 	

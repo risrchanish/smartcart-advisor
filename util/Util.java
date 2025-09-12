@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -84,22 +86,57 @@ public class Util {
 	    }
 		
 		
-	    public static double[] encode(Product product) 
-	    {
-	         ProductMetadata metadata = product.getMetadata();
+	    public static double[] encode(Product product) {
+	        List<ProductMetadata> metadataList = Optional.ofNullable(product.getMetadataList())
+	            .orElse(Collections.emptyList());
 
-	         return new double[] 
-	        		 {
-	        				 categoryScore(product.getCategory()),
-	        				 brandScore(metadata != null ? metadata.getBrand() : null),
-	        				 colorScore(metadata != null ? metadata.getColor() : null),
-	        				 materialScore(metadata != null ? metadata.getMaterial() : null),
-	        				 tagDensity(metadata != null ? metadata.getTags() : null),
-	        				 normalizedPrice(product.getPrice(), metadata != null ? 
-	                			metadata.getMinPrice() : null, metadata != null ? metadata.getMaxPrice() : null)
-	            };
-	        }
-	    
+	        double category = categoryScore(product.getCategory());
+
+	        double brand = metadataList.stream()
+	            .map(ProductMetadata::getBrand)
+	            .filter(val -> Objects.nonNull(val))
+	            .mapToDouble(str -> brandScore(str))
+	            .average()
+	            .orElse(0.0);
+
+	        double color = metadataList.stream()
+	            .map(ProductMetadata::getColor)
+	            .filter(Objects::nonNull)
+	            .mapToDouble(str -> colorScore(str))
+	            .average()
+	            .orElse(0.0);
+
+	        double material = metadataList.stream()
+	            .map(ProductMetadata::getMaterial)
+	            .filter(Objects::nonNull)
+	            .mapToDouble(str -> materialScore(str))
+	            .average()
+	            .orElse(0.0);
+
+	        double tagDensity = metadataList.stream()
+	            .map(ProductMetadata::getTags)
+	            .filter(Objects::nonNull)
+	            .mapToDouble(tag -> tagDensity(tag))
+	            .average()
+	            .orElse(0.0);
+
+	        double normalizedPrice = metadataList.stream()
+	            .mapToDouble(m -> normalizedPrice(
+	                product.getPrice(),
+	                m.getMinPrice(),
+	                m.getMaxPrice()))
+	            .average()
+	            .orElse(0.0);
+
+	        return new double[] {
+	            category,
+	            brand,
+	            color,
+	            material,
+	            tagDensity,
+	            normalizedPrice
+	        };
+	    }	    
 
 		
 		// Utility method to be used in get similar products for batch

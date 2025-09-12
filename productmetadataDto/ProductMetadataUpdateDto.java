@@ -3,23 +3,30 @@ package risrchanish.product.recommend.dto.productmetadata;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public class ProductMetadataUpdateDto {
 	
-//	@NotNull(message = "Metadata id is required")
+	@NotNull(message = "Metadata id is required")
 	private Long metadataId;
 	
-//	@NotBlank(message = "Brand is required")
+	@NotBlank(message = "Brand is required")
 	private String brand;
 	
-//	@NotBlank(message = "Color is required")
+	@NotBlank(message = "Color is required")
 	private String color;
 	
-//	@NotBlank(message = "Size is required")
+	@NotBlank(message = "Size is required")
 	private String size;
 	
-//	@NotBlank(message = "Material is required")
+	@NotBlank(message = "Material is required")
 	private String material;
 	
+	private Double maxPrice;
+	
+	private Double minPrice;
+
 	
 	private List<String> tags;
 	private Map<String, String> additionalAttributes;
@@ -109,6 +116,32 @@ public class ProductMetadataUpdateDto {
 
 	public void setAdditionalAttributes(Map<String, String> additionalAttributes) {
 		this.additionalAttributes = additionalAttributes;
+	}
+
+	
+
+	public Double getMaxPrice() {
+		return maxPrice;
+	}
+
+
+	public void setMaxPrice(Double maxPrice) {
+		this.maxPrice = maxPrice;
+	}
+
+
+	public Double getMinPrice() {
+		return minPrice;
+	}
+
+
+	public void setMinPrice(Double minPrice) {
+		this.minPrice = minPrice;
+	}
+
+
+	public void setMetadataId(Long metadataId) {
+		this.metadataId = metadataId;
 	}
 
 

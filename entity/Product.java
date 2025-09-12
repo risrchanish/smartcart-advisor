@@ -3,6 +3,7 @@ package risrchanish.product.recommend.entity;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import jakarta.persistence.CascadeType;
@@ -26,9 +27,8 @@ public class Product {
 	private String name;
 	private String category;
 	
-	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "metadata_id" , referencedColumnName = "metadataId")
-	private ProductMetadata metadata;
+	@OneToMany(mappedBy ="product", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<ProductMetadata> metadataList = new ArrayList<>();
 	
 	
 	private double price;
@@ -90,12 +90,13 @@ public class Product {
 		this.category = category;
 	}
 
-	public ProductMetadata getMetadata() {
-		return metadata;
+	public List<ProductMetadata> getMetadataList() {
+		return metadataList;
 	}
 
-	public void setMetadata(ProductMetadata metadata) {
-		this.metadata = metadata;
+	public void setMetadataList(List<ProductMetadata> metadataList) {
+		
+		this.metadataList = metadataList;
 	}
 
 	public double getPrice() {
@@ -147,10 +148,16 @@ public class Product {
 								features.stream().map(feature -> feature.getFeatureId())
 								.collect(Collectors.toList()) :
 									Collections.emptyList();
+		
+		List<Long> metadataIds = metadataList != null ?
+				metadataList.stream().map(metadata -> metadata.getMetadataId())
+								.collect(Collectors.toList()) :
+									Collections.emptyList();
 
 		
-		return "Product [productId=" + productId + ", name=" + name + ", category=" + category + 
-				", metadata=" + (metadata != null ? metadata.getMetadataId() : null) + 
+		return "Product [productId=" + productId + ", name=" + Objects.toString(name) + ", category=" + Objects.toString(category) + 
+				", metadata="+metadataIds+
+				", metadataCount=" + (metadataList != null ? metadataList.size() : 0) +
 				", price=" + price + ", inStock=" + inStock + 
 				", ratingsIds="  + ratingsIds + 
 				", featuresIds=" + featuresIds + "]";

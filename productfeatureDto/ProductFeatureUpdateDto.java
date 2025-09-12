@@ -2,17 +2,19 @@ package risrchanish.product.recommend.dto.productfeature;
 
 import java.util.List;
 
-import risrchanish.product.recommend.entity.Product;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+
 
 public class ProductFeatureUpdateDto {
 
-//	@NotNull(message = "Product feature id is required")
+	@NotNull(message = "Product feature id is required")
 	private Long featureId;
 	
-//	@NotNull(message = "ProductId is required")
+	@NotNull(message = "ProductId is required")
 	private Long productId;
 	
-//	@NotEmpty(message = "feature vector must not be empty")
+	@NotEmpty(message = "feature vector must not be empty")
 	private List<Double> featureVector;
 	
 	

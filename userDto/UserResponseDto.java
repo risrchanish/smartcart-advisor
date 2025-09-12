@@ -2,7 +2,7 @@ package risrchanish.product.recommend.dto.user;
 
 import java.util.List;
 
-import risrchanish.product.recommend.dto.preference.PreferenceDto;
+import risrchanish.product.recommend.dto.preference.PreferenceResponseDto;
 
 public record UserResponseDto(
 		Long userId,
@@ -10,7 +10,7 @@ public record UserResponseDto(
 		String email,
 		Integer age,
 		String location,
-		List<PreferenceDto> preferences
+		List<PreferenceResponseDto> preferences
 		
 		
 		) {}

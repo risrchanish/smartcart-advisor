@@ -3,19 +3,24 @@ package risrchanish.product.recommend.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import risrchanish.product.recommend.dto.preference.PreferenceDto;
+import risrchanish.product.recommend.dto.preference.PreferenceCreateDto;
+import risrchanish.product.recommend.dto.preference.PreferenceResponseDto;
+import risrchanish.product.recommend.dto.preference.PreferenceUpdateDto;
+
 
 public interface PreferenceService {
 
-	    PreferenceDto createPreference(PreferenceDto dto);
+	    PreferenceResponseDto createPreference(PreferenceCreateDto dto);
 
-	    PreferenceDto updatePreference(Long preferenceId, PreferenceDto dto);
+	    PreferenceResponseDto updatePreference(Long preferenceId, PreferenceUpdateDto dto);
 
-	    PreferenceDto getPreferenceById(Long preferenceId);
+	    PreferenceResponseDto getPreferenceById(Long preferenceId);
+	    
+	    Page<PreferenceResponseDto> getAllPreferences(Pageable pageable);
 
-	    Page<PreferenceDto> getPreferencesByUserId(Long userId, Pageable pageable);
+	    Page<PreferenceResponseDto> getPreferencesByUserId(Long userId, Pageable pageable);
 
-	    Page<PreferenceDto> searchPreferencesByName(String name, Pageable pageable);
+	    Page<PreferenceResponseDto> searchPreferencesByName(String name, Pageable pageable);
 
 	    void deletePreference(Long preferenceId);
 	

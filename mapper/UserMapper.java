@@ -5,7 +5,9 @@ import java.util.List;
 
 import java.util.Optional;
 import java.util.Collections;
-import risrchanish.product.recommend.dto.preference.PreferenceDto;
+
+import risrchanish.product.recommend.dto.preference.PreferenceCreateDto;
+import risrchanish.product.recommend.dto.preference.PreferenceResponseDto;
 import risrchanish.product.recommend.dto.user.UserCreateDto;
 import risrchanish.product.recommend.dto.user.UserResponseDto;
 import risrchanish.product.recommend.dto.user.UserUpdateDto;
@@ -51,11 +53,11 @@ public class UserMapper {
 		
 		// PreferenceDto from Preference
 		
-		List<PreferenceDto> preferencesDto = Optional.ofNullable(user.getPreferences())
+		List<PreferenceResponseDto> preferencesDto = Optional.ofNullable(user.getPreferences())
 													.orElse(Collections.emptyList())
 													.stream()
 												.map(pref -> 
-												new PreferenceDto(pref.getPreferenceId(),pref.getName())).toList();
+												new PreferenceResponseDto(pref.getPreferenceId(),pref.getName(),user.getUserId())).toList();
 		
 		return new UserResponseDto(
 					
@@ -93,7 +95,8 @@ public class UserMapper {
 						return pref;
 					}).toList();
 			
-			user.setPreferences(preferences);
+			user.getPreferences().clear();
+			user.getPreferences().addAll(preferences);
 		}
 		
 		return user;
@@ -101,12 +104,11 @@ public class UserMapper {
 	
 	// PreferenceDto  ----> Preference
 	
-	public static Preference toEntity(PreferenceDto dto, User user)
+	public static Preference toEntity(PreferenceCreateDto dto, User user)
 	{
 		Preference pref = new Preference();
 		
 		pref.setName(dto.getName());
-		pref.setPreferenceId(dto.getPreferenceId());
 		pref.setUser(user);
 		
 		return pref;
@@ -115,9 +117,9 @@ public class UserMapper {
 	
 	//Preference  ---> PreferenceDto
 	
-	public static PreferenceDto toDto(Preference pref)
+	public static PreferenceResponseDto toResponseDto(Preference pref)
 	{
-		 return new PreferenceDto(pref.getPreferenceId(),pref.getName());
+		 return new PreferenceResponseDto(pref.getPreferenceId(),pref.getName(),pref.getUser().getUserId());
 	}
 	
 

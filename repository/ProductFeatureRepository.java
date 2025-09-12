@@ -9,13 +9,18 @@ import risrchanish.product.recommend.entity.ProductFeature;
 
 public interface ProductFeatureRepository extends JpaRepository<ProductFeature, Long>{
 
+	
 	//Get all features paginated
-	Page<ProductFeature> findAllFeatures(Pageable pageable);
+	Page<ProductFeature> findAll(Pageable pageable);
+	
+	ProductFeature findByProduct_ProductId(Long productId);
 	
 	//Get features by product Id
-	Page<ProductFeature> findFeaturesByProductId(Long productId);
+	Page<ProductFeature> findByProduct_ProductId(Long productId, Pageable pageable);
 	
 	//Search by category or metadata if needed
 	@Query("select pf from ProductFeature pf where pf.product.category = :category")
 	Page<ProductFeature> findByProductCategory(String category, Pageable pageable);
+	
+	boolean existsByProduct_ProductId(Long productId);
 }

@@ -12,9 +12,9 @@ import risrchanish.product.recommend.entity.User;
 public interface UserRepository extends JpaRepository<User, Long>{
 	
 	
-	public Page<User> findByName(String name, Pageable pageable);
+	public Page<User> findByNameContainingIgnoreCase(String name, Pageable pageable);
 	
-	public Page<User> findByLocation(String location, Pageable pageable);
+	public Page<User> findByLocationContainingIgnoreCase(String location, Pageable pageable);
 	
 	public Page<User> findUsersByAgeBetween(int minimum, int maximum, Pageable pageable);
 	

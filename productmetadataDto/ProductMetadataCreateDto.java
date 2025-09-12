@@ -1,28 +1,36 @@
 package risrchanish.product.recommend.dto.productmetadata;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public class ProductMetadataCreateDto {
 
-//	@NotBlank(message = "Brand is required")
+	@NotBlank(message = "Brand is required")
 	private String brand;
 	
-//	@NotBlank(message = "Color is required")
+	@NotBlank(message = "Color is required")
 	private String color;
 	
-//	@NotBlank(message = "Size is required")
+	@NotBlank(message = "Size is required")
 	private String size;
 	
-//	@NotBlank(message = "Material is required")
+	@NotBlank(message = "Material is required")
 	private String material;
+	
+	@NotNull(message = "Product Id is required")
+	private Long productId;
 	
 	private Double maxPrice;
 	
 	private Double minPrice;
 	
-	private List<String> tags;
-	private Map<String, String> additionalAttributes;
+	private List<String> tags = new ArrayList<>();
+	private Map<String, String> additionalAttributes = new HashMap<>();
 
 	
 	public ProductMetadataCreateDto()
@@ -42,6 +50,16 @@ public class ProductMetadataCreateDto {
 
 
 	
+	public Long getProductId() {
+		return productId;
+	}
+
+
+	public void setProductId(Long productId) {
+		this.productId = productId;
+	}
+
+
 	public Double getMaxPrice() {
 		return maxPrice;
 	}

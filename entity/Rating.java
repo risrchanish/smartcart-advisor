@@ -29,29 +29,29 @@ public class Rating {
 	
 	private double rating;
 	private String reviewText;
-	private boolean isVerified;
+	private boolean verified;
 	private LocalDateTime timestamp;
 	
 	
 	public Rating()
 	{}
 	
-	public Rating( double rating, String reviewText, boolean isVerified, LocalDateTime timestamp) {
+	public Rating( double rating, String reviewText, boolean verified, LocalDateTime timestamp) {
 		this.rating = rating;
 		this.reviewText = reviewText;
 		this.timestamp = timestamp;
-		this.isVerified = isVerified;
+		this.verified = verified;
 	}
 
-	public Rating(Long ratingId, User user, Product product, double rating, String reviewText, boolean isVerified, LocalDateTime timestamp) {
-		super();
+	public Rating(Long ratingId, User user, Product product, double rating, String reviewText, boolean verified, LocalDateTime timestamp) {
+		
 		this.ratingId = ratingId;
 		this.user = user;
 		this.product = product;
 		this.rating = rating;
 		this.reviewText = reviewText;
 		this.timestamp = timestamp;
-		this.isVerified = isVerified;
+		this.verified = verified;
 	}
 
 
@@ -85,15 +85,7 @@ public class Rating {
 	}
 
 
-	public boolean isVerified() {
-		return isVerified;
-	}
-
-
-	public void setVerified(boolean isVerified) {
-		this.isVerified = isVerified;
-	}
-
+	
 
 	public double getRating() {
 		return rating;
@@ -117,6 +109,14 @@ public class Rating {
 	
 
 
+	public boolean isVerified() {
+		return verified;
+	}
+
+	public void setVerified(boolean verified) {
+		this.verified = verified;
+	}
+
 	public LocalDateTime getTimestamp() {
 		return timestamp;
 	}
@@ -137,7 +137,7 @@ public class Rating {
 		return "Rating [ratingId=" + ratingId + 
 				", user=" + (user != null ? user.getUserId() : null) + 
 				", product=" + (product != null ? product.getProductId() : null) + ", rating=" + rating
-				+ ", reviewText=" + reviewText + ", isVerified=" + isVerified + ", timestamp=" + timestamp + "]";
+				+ ", reviewText=" + reviewText + ", verified=" + verified + ", timestamp=" + timestamp + "]";
 	}
 	
 	

@@ -1,18 +1,22 @@
 package risrchanish.product.recommend.dto.product;
 
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 public class ProductUpdateDto {
 
-//	@NotNull(message = "Product id is required")
+	@NotNull(message = "Product id is required")
 	private Long productId;
 	
-//	@NotBlank(message = "Product name is required")
+	@NotBlank(message = "Product name is required")
 	private String name;
 	
-//	@NotNull(message = "Price must be provided")
-//	@DecimalMin(value = "0.0", inclusive = true, message = "Price must not be negative")
+	@NotNull(message = "Price must be provided")
+	@DecimalMin(value = "0.0", inclusive = true, message = "Price must not be negative")
 	private Double price;
 	
-//	@NotBlank(message = "Category is required")
+	@NotBlank(message = "Category is required")
 	private String category;
 	
 	private boolean inStock;

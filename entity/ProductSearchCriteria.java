@@ -6,16 +6,18 @@ import java.util.Map;
 
 import org.springframework.data.domain.Sort;
 
+import jakarta.validation.constraints.Min;
+
 public class ProductSearchCriteria {
 
 	private List<String> categories;
-	private Map<String, String> metadata;
 	
-//	@Min(value = 0, message = "Minimum price must not be negative")
+	@Min(value = 0, message = "Minimum price must not be negative")
 	private Double minPrice;
 	
-//	@Min(value = 0, message = "Minimum price must not be negative")
+	@Min(value = 0, message = "Minimum price must not be negative")
 	private Double maxPrice;
+	
 	private String nameKeyword;
 	private List<String> brands;
 	private List<String> colors;
@@ -28,12 +30,11 @@ public class ProductSearchCriteria {
 	// All argument constructor
 	
 
-	public ProductSearchCriteria(List<String> categories, Map<String, String> metadata, Double minPrice,
+	public ProductSearchCriteria(List<String> categories, Double minPrice,
 			Double maxPrice, String nameKeyword, List<String> brands, List<String> colors, List<String> materials,
 			List<String> tags, Map<String, String> additionalAttributes, Sort sort) {
 
 		this.categories = categories;
-		this.metadata = metadata;
 		this.minPrice = minPrice;
 		this.maxPrice = maxPrice;
 		this.nameKeyword = nameKeyword;
@@ -58,16 +59,6 @@ public class ProductSearchCriteria {
 	}
 
 
-	public Map<String, String> getMetadata() {
-		return metadata;
-	}
-
-
-	public void setMetadata(Map<String, String> metadata) {
-		this.metadata = metadata;
-	}
-
-
 	public Double getMinPrice() {
 		return minPrice;
 	}
@@ -88,9 +79,6 @@ public class ProductSearchCriteria {
 	}
 	
 	
-	
-
-
 	public String getNameKeyword() {
 		return nameKeyword;
 	}
@@ -177,7 +165,7 @@ public class ProductSearchCriteria {
 
 	@Override
 	public String toString() {
-		return "ProductSearchCriteria [categories=" + categories + ", metadata=" + metadata + ", minPrice=" + minPrice
+		return "ProductSearchCriteria [categories=" + categories + ", minPrice=" + minPrice
 				+ ", maxPrice=" + maxPrice + ", nameKeyword=" + nameKeyword + ", brands=" + brands + ", colors="
 				+ colors + ", materials=" + materials + ", tags=" + tags + ", additionalAttributes="
 				+ additionalAttributes + ", sort=" + sort + "]";

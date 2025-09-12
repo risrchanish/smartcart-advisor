@@ -13,7 +13,7 @@ public interface DiscountRuleService {
 
 	DiscountRuleResponseDto createDiscountRule(DiscountRuleCreateDto dto);
 	
-	DiscountRuleResponseDto updateDiscountRule(DiscountRuleUpdateDto dto);
+	DiscountRuleResponseDto updateDiscountRule(Long discountID, DiscountRuleUpdateDto dto);
 	
 	DiscountRuleResponseDto getDiscountRuleById(Long discountId);
 	
@@ -25,7 +25,9 @@ public interface DiscountRuleService {
 	
 	Page<DiscountRuleResponseDto> getDiscountRulesByProductId(Long productId, Pageable pageable);
 	
-	Double applyDiscountByProduct(Product product);
+	Double applyDiscountByProduct(Long productId);
+	
+	void deleteDiscountRule(Long discountId);
 	
 	
 }

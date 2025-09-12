@@ -1,7 +1,5 @@
 package risrchanish.product.recommend.service;
 
-import java.util.List;
-import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import risrchanish.product.recommend.dto.user.UserCreateDto;
 import risrchanish.product.recommend.dto.user.UserResponseDto;
 import risrchanish.product.recommend.dto.user.UserUpdateDto;
-import risrchanish.product.recommend.entity.User;
+
 
 public interface UserService {
 	

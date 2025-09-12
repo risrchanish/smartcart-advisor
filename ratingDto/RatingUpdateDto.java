@@ -19,7 +19,7 @@ public class RatingUpdateDto {
 	
 //	@Size(max = 1000, message = "Review texts must be under 1000 characters")
 	private String reviewText;
-	private boolean isVerified;
+	private boolean verified;
 	
 //	@NotNull(message = "Timestamp is required")
 	private LocalDateTime timestamp;
@@ -31,22 +31,22 @@ public class RatingUpdateDto {
 	
 	
 	public RatingUpdateDto(double rating, String reviewText,
-			boolean isVerified, LocalDateTime timestamp) {
+			boolean verified, LocalDateTime timestamp) {
 		this.rating = rating;
 		this.reviewText = reviewText;
-		this.isVerified = isVerified;
+		this.verified = verified;
 		this.timestamp = timestamp;
 	}
 
 	public RatingUpdateDto(Long ratingId, Long userId, Long productId, double rating, String reviewText,
-			boolean isVerified, LocalDateTime timestamp) {
+			boolean verified, LocalDateTime timestamp) {
 		
 		this.ratingId = ratingId;
 		this.userId = userId;
 		this.productId = productId;
 		this.rating = rating;
 		this.reviewText = reviewText;
-		this.isVerified = isVerified;
+		this.verified = verified;
 		this.timestamp = timestamp;
 	}
 
@@ -102,12 +102,12 @@ public class RatingUpdateDto {
 
 
 	public boolean isVerified() {
-		return isVerified;
+		return verified;
 	}
 
 
-	public void setVerified(boolean isVerified) {
-		this.isVerified = isVerified;
+	public void setVerified(boolean verified) {
+		this.verified = verified;
 	}
 
 
@@ -124,7 +124,7 @@ public class RatingUpdateDto {
 	@Override
 	public String toString() {
 		return "RatingUpdateDto [ratingId=" + ratingId + ", userId=" + userId + ", productId=" + productId + ", rating="
-				+ rating + ", reviewText=" + reviewText + ", isVerified=" + isVerified + ", timestamp=" + timestamp
+				+ rating + ", reviewText=" + reviewText + ", verified=" + verified + ", timestamp=" + timestamp
 				+ "]";
 	}
 	

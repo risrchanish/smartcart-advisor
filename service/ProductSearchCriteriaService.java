@@ -1,6 +1,7 @@
 package risrchanish.product.recommend.service;
 
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,7 +14,7 @@ import risrchanish.product.recommend.entity.ProductSearchCriteria;
 public interface ProductSearchCriteriaService {
 	   
 	    // Metadata field-specific filters
-	    Page<ProductResponseDto> searchByMetadataField(String fieldName, List<String> values, Pageable pageable);
+	    Page<ProductResponseDto> searchByMetadataField(String fieldName, Set<String> values, Pageable pageable);
 
 	    // Availability (if stock tracking is added)
 	    Page<ProductResponseDto> getProductsByAvailability(boolean inStock, Pageable pageable);
@@ -24,7 +25,7 @@ public interface ProductSearchCriteriaService {
 	    // Unified search using full criteria object
 	    Page<ProductResponseDto> getProductsByCombinedCriteria(ProductSearchCriteria criteria, Pageable pageable);
 	    
-	    Page<ProductResponseDto> getSortedProducts(Sort sort, Pageable pageable);
+	    Page<ProductResponseDto> getSortedProducts(Pageable pageable);
 	    
 	    Page<ProductResponseDto> getSimilarProductsForBatch(List<Long> productIds, Pageable pageable);
 		

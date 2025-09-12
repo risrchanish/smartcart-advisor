@@ -2,28 +2,31 @@ package risrchanish.product.recommend.dto.user;
 
 import java.util.List;
 
-import risrchanish.product.recommend.dto.preference.PreferenceDto;
-
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import risrchanish.product.recommend.dto.preference.PreferenceCreateDto;
 
 
 public class UserCreateDto {
 
-//	@NotBlank(message = "Name is required")
+	@NotBlank(message = "Name is required")
 	private String name;
 	
-//	@Email(message = "Invalid email format")
-//	@NotBlank(message = "Email is required")
+	@Email(message = "Invalid email format")
+	@NotBlank(message = "Email is required")
 	private String email;
 	
-//	@NotNull(message = "Age is required")
-//	@Min(value = 12,message = "Minimum age is 12")
+	@NotNull(message = "Age is required")
+	@Min(value = 12,message = "Minimum age is 12")
 	private Integer age;
 	
-//	@NotBlank(message = "Location is required")
+	@NotBlank(message = "Location is required")
 	private String location;
 	
 	
-	private List<PreferenceDto> preferences;
+	private List<PreferenceCreateDto> preferences;
 	
 	
 	public UserCreateDto()
@@ -32,7 +35,7 @@ public class UserCreateDto {
 	}
 
 
-	public UserCreateDto(String name, String email, Integer age, String location, List<PreferenceDto> preferences) {
+	public UserCreateDto(String name, String email, Integer age, String location, List<PreferenceCreateDto> preferences) {
 		this.name = name;
 		this.email = email;
 		this.age = age;
@@ -81,12 +84,12 @@ public class UserCreateDto {
 	}
 
 
-	public List<PreferenceDto> getPreferences() {
+	public List<PreferenceCreateDto> getPreferences() {
 		return preferences;
 	}
 
 
-	public void setPreferences(List<PreferenceDto> preferences) {
+	public void setPreferences(List<PreferenceCreateDto> preferences) {
 		this.preferences = preferences;
 	}
 

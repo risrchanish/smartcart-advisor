@@ -12,12 +12,12 @@ import risrchanish.product.recommend.entity.Rating;
 
 public interface RatingRepository extends JpaRepository<Rating, Long>{
 	
-	Page<Rating> findByProductId(Long productId, Pageable pageable);
+	Page<Rating> findByProduct_ProductId(Long productId, Pageable pageable);
 	
-	Page<Rating> findByUserId(Long userId, Pageable pageable);
+	Page<Rating> findByUser_UserId(Long userId, Pageable pageable);
 	
-	Page<Rating> findByProductIdAndIsVerifiedTrue(Long productId, Pageable pageable);
+	Page<Rating> findByProduct_ProductIdAndVerifiedTrue(Long productId, Pageable pageable);
 	
-	Optional<Rating> findByUserIdAndProductId(Long userId, Long productId);
+	Optional<Rating> findByUser_UserIdAndProduct_ProductId(Long userId, Long productId);
 
 }

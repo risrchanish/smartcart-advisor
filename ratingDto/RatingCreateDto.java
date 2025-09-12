@@ -2,35 +2,45 @@ package risrchanish.product.recommend.dto.rating;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+
 public class RatingCreateDto {
 
-//	@DecimalMin(value = "0.0", message = "rating must be atleast 0")
-//	@DecimalMax(value = "5.0", message = "Rating must be at most 5")
+	@DecimalMin(value = "0.0", message = "rating must be at least 0")
+	@DecimalMax(value = "5.0", message = "Rating must be at most 5")
 	private double rating;
 	
-//	@Size(max = 1000, message = "Review texts must be under 1000 characters")
+	@Size(max = 1000, message = "Review texts must be under 1000 characters")
 	private String reviewText;
 	
-	private boolean isVerified;
+	@JsonProperty("verified")
+	private boolean verified;
 	
-//	@NotNull(message = "Timestamp is required")
+	@JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")  // "timestamp format": "2025-09-10T14:30:00"
+	@NotNull(message = "Time stamp is required")
 	private LocalDateTime timestamp;
 	
-//	@NotNull(message = "User id is required")
+	@NotNull(message = "User id is required")
 	private Long userId;
 
-//	@NotNull(message = "Product id is required")	
+	@NotNull(message = "Product id is required")	
 	private Long productId;
 	
 	public RatingCreateDto()
 	{}
 
 
-	public RatingCreateDto(double rating, String reviewText, boolean isVerified, LocalDateTime timestamp) {
+	public RatingCreateDto(double rating, String reviewText, boolean verified, LocalDateTime timestamp) {
 		super();
 		this.rating = rating;
 		this.reviewText = reviewText;
-		this.isVerified = isVerified;
+		this.verified = verified;
 		this.timestamp = timestamp;
 	}
 
@@ -56,12 +66,12 @@ public class RatingCreateDto {
 
 
 	public boolean isVerified() {
-		return isVerified;
+		return verified;
 	}
 
 
-	public void setVerified(boolean isVerified) {
-		this.isVerified = isVerified;
+	public void setVerified(boolean verified) {
+		this.verified = verified;
 	}
 
 
@@ -98,7 +108,7 @@ public class RatingCreateDto {
 
 	@Override
 	public String toString() {
-		return "RatingCreateDto [rating=" + rating + ", reviewText=" + reviewText + ", isVerified=" + isVerified
+		return "RatingCreateDto [rating=" + rating + ", reviewText=" + reviewText + ", verified=" + verified
 				+ ", timestamp=" + timestamp + "]";
 	}
 	

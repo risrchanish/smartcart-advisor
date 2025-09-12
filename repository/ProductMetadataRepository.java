@@ -10,11 +10,13 @@ public interface ProductMetadataRepository extends JpaRepository<ProductMetadata
 
 	Page<ProductMetadata> findByBrandContainingIgnoreCase(String brand, Pageable pageable);
 	
-	Page<ProductMetadata> findByColor(String color, Pageable pageable);
+	Page<ProductMetadata> findByColorContainingIgnoreCase(String color, Pageable pageable);
 	
 	Page<ProductMetadata> findByMaterial(String material, Pageable pageable);
 	
 	Page<ProductMetadata> findAll(Pageable pageable);
+	
+	boolean existsByproduct_ProductId(Long productId); // Added this to avoid adding more than one metadata for a single product
 	
 	
 	

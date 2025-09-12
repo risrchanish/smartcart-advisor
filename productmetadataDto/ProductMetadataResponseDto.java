@@ -9,6 +9,8 @@ public record ProductMetadataResponseDto(
 		String color,
 		String size,
 		String material,
+		Double maxPrice,
+		Double minPrice,
 		List<String> tags,
 		Map<String, String> additionalAttributes
 		

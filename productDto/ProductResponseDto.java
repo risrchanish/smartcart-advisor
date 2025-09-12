@@ -14,7 +14,7 @@ public record ProductResponseDto(
 		Double price,
 		String category,
 		Double discountedPrice, // computed in service
-		ProductMetadataResponseDto metadata,  // For ML filtering or can be written as 
+		List<ProductMetadataResponseDto> metadataList,  // For ML filtering or can be written as 
 		boolean inStock,
 		List<RatingResponseDto> ratings,	
 		List<ProductFeatureResponseDto> featureVector

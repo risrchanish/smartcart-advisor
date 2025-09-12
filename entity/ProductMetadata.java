@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.springframework.data.domain.Sort;
 
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
@@ -15,6 +14,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapKeyColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
@@ -34,7 +34,8 @@ public class ProductMetadata {
 	private Double minPrice;
 	private Double maxPrice;
 	
-	@OneToOne(mappedBy = "metadata")
+	@ManyToOne
+	@JoinColumn(name = "product_id")
 	private Product product;
 	
 	@ElementCollection
@@ -85,12 +86,12 @@ public class ProductMetadata {
 	}
 
 
-//
-//	public void setMetadataId(Long metadataId) {
-//		this.metadataId = metadataId;
-//	}
-//
-//
+
+	public void setMetadataId(Long metadataId) {
+		this.metadataId = metadataId;
+	}
+
+
 
 	
 	

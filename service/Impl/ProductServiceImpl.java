@@ -1,9 +1,11 @@
 package risrchanish.product.recommend.service.Impl;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -19,6 +21,7 @@ import risrchanish.product.recommend.entity.Rating;
 import risrchanish.product.recommend.entity.User;
 import risrchanish.product.recommend.exception.ResourceNotFoundException;
 import risrchanish.product.recommend.mapper.ProductMapper;
+import risrchanish.product.recommend.mapper.ProductMetadataMapper;
 import risrchanish.product.recommend.mapper.RatingMapper;
 import risrchanish.product.recommend.repository.ProductRepository;
 import risrchanish.product.recommend.repository.UserRepository;
@@ -41,18 +44,20 @@ public class ProductServiceImpl implements ProductService{
 	
 	
 	// Calculating the discounted price
+	
+	
 	@Override
 	public Double calculateDiscountedPrice(Product product) 
 	{
-		return discountService.applyDiscountByProduct(product);
+		
+		return discountService.applyDiscountByProduct(product.getProductId());
 	}
 
 	
 	@Override
 	public ProductResponseDto createProduct(ProductCreateDto dto) {
 
-	    Product product = ProductMapper.toProduct(dto); // No ratings mapped here
-	    productRepository.saveAndFlush(product); // immediate sync with db
+	    Product product = ProductMapper.toProduct(dto); // No ratings, metadata mapped here
 	   
 	   // getting rating
 	    
@@ -63,10 +68,12 @@ public class ProductServiceImpl implements ProductService{
 	    								User user = userRepository.findById(ratingDto.getUserId())
 	    											.orElseThrow(() -> new ResourceNotFoundException("User not found"));
 	    						return RatingMapper.toRating(ratingDto, product, user);
-	    						}).toList();
+	    						}).collect(Collectors.toList());
 
-	    product.setRatings(ratings);  
+	    product.setRatings(ratings);
+	    product.setMetadataList(ProductMetadataMapper.toProductMetadata(dto.getMetadataList(), product)); 
 	    productRepository.save(product); // Save with ratings attached
+	    
 
 	    Double discountedPrice = calculateDiscountedPrice(product);
 	    return ProductMapper.toProductResponseDto(product, discountedPrice);
@@ -81,7 +88,7 @@ public class ProductServiceImpl implements ProductService{
 		
 		Product updatedProduct = ProductMapper.toProduct(product, dto);
 		
-		Double discountedCost = discountService.applyDiscountByProduct(updatedProduct);
+		Double discountedCost = discountService.applyDiscountByProduct(updatedProduct.getProductId());
 		
 		return ProductMapper.toProductResponseDto(updatedProduct, discountedCost);
 		
@@ -93,7 +100,7 @@ public class ProductServiceImpl implements ProductService{
 		Product product = productRepository.findById(productId)
 							.orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 		
-		Double discountedCost = discountService.applyDiscountByProduct(product);
+		Double discountedCost = discountService.applyDiscountByProduct(product.getProductId());
 		
 		return ProductMapper.toProductResponseDto(product, discountedCost);
 	}
@@ -110,7 +117,7 @@ public class ProductServiceImpl implements ProductService{
 		
 		 
 		Page<ProductResponseDto> dto = products.map(product -> {	
-										Double discountedCost = discountService.applyDiscountByProduct(product);
+										Double discountedCost = discountService.applyDiscountByProduct(product.getProductId());
 										return ProductMapper.toProductResponseDto(product, discountedCost);
 										});
 		return dto;
@@ -127,7 +134,7 @@ public class ProductServiceImpl implements ProductService{
 		}
 		
 		return products.map(product -> {
-						Double discountedCost = discountService.applyDiscountByProduct(product);
+						Double discountedCost = discountService.applyDiscountByProduct(product.getProductId());
 						return ProductMapper.toProductResponseDto(product, discountedCost);
 							});
 	}
@@ -143,7 +150,7 @@ public class ProductServiceImpl implements ProductService{
 		}
 		
 		return products.map(product -> {
-							Double discountedCost = discountService.applyDiscountByProduct(product);
+							Double discountedCost = discountService.applyDiscountByProduct(product.getProductId());
 							return ProductMapper.toProductResponseDto(product, discountedCost);
 						});
 	}
@@ -172,15 +179,16 @@ public class ProductServiceImpl implements ProductService{
 		
 		List<Product> filteredProducts = products.stream().filter(product -> {
 			
-			ProductMetadata metadata = Optional.ofNullable(product.getMetadata()).orElse(null);
+		List<ProductMetadata> metadataList = Optional.ofNullable(product.getMetadataList())
+											.orElse(Collections.emptyList());
 			
-			if(metadata == null)
-			{
-				return false;
-			}
+
+		return metadataList.stream().anyMatch(metadata -> {
 			
 			Map<String, String> attributes = Optional.ofNullable(metadata.getAdditionalAttributes())
-												.orElse(Collections.emptyMap());
+					.map(map -> new HashMap<>(map))
+					.orElse(new HashMap<>());
+			
 			
 			return filters.entrySet().stream().allMatch(entry ->{
 				String key = entry.getKey().toLowerCase();
@@ -204,15 +212,18 @@ public class ProductServiceImpl implements ProductService{
 							
 							default -> value.equalsIgnoreCase(attributes.get(key));
 						};
-						return match;
+				return match;
+
+				});
+					
 			});
 			
 			
-		}).toList();
+			}).toList();
 		
 		List<ProductResponseDto> dtos = filteredProducts.stream().map(product -> {
 			
-			Double discountedCost = discountService.applyDiscountByProduct(product);
+			Double discountedCost = discountService.applyDiscountByProduct(product.getProductId());
 			
 			return ProductMapper.toProductResponseDto(product, discountedCost);
 		}).toList();
@@ -234,7 +245,7 @@ public class ProductServiceImpl implements ProductService{
 		
 		return products.map(product -> {
 			
-			Double discountedCost = discountService.applyDiscountByProduct(product);
+			Double discountedCost = discountService.applyDiscountByProduct(product.getProductId());
 			
 			return ProductMapper.toProductResponseDto(product, discountedCost);
 		});
@@ -253,7 +264,7 @@ public class ProductServiceImpl implements ProductService{
 		
 		return products.map(product -> {
 			
-			Double discountedCost = discountService.applyDiscountByProduct(product);
+			Double discountedCost = discountService.applyDiscountByProduct(product.getProductId());
 			return ProductMapper.toProductResponseDto(product, discountedCost);
 		});
 	}

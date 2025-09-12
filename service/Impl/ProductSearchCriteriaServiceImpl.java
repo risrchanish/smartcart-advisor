@@ -2,8 +2,7 @@ package risrchanish.product.recommend.service.Impl;
 
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -127,7 +126,7 @@ public class ProductSearchCriteriaServiceImpl implements ProductSearchCriteriaSe
 		
 		List<ProductResponseDto> pagedDtos = pagedProducts.stream()
 												.map(product -> {
-								double discountedCost = discountService.applyDiscountByProduct(product);
+								double discountedCost = discountService.applyDiscountByProduct(product.getProductId());
 								return ProductMapper.toProductResponseDto(product, discountedCost);
 												}).toList();
 		return new PageImpl<ProductResponseDto>(pagedDtos, pageable, productList.size());
@@ -147,7 +146,7 @@ public class ProductSearchCriteriaServiceImpl implements ProductSearchCriteriaSe
 		}
 		
 		return products.map(product -> {
-			Double discountedCost = discountService.applyDiscountByProduct(product);
+			Double discountedCost = discountService.applyDiscountByProduct(product.getProductId());
 			return ProductMapper.toProductResponseDto(product, discountedCost);
 		});
 	}
@@ -193,7 +192,7 @@ public class ProductSearchCriteriaServiceImpl implements ProductSearchCriteriaSe
 		// Getting the DTO on the sorted list with discount applied
 		List<ProductResponseDto> pagedDtos = sortedProductList.subList(start, end).stream()
 											.map(product -> {
-											double discountedCost = discountService.applyDiscountByProduct(product);
+											double discountedCost = discountService.applyDiscountByProduct(product.getProductId());
 											return ProductMapper.toProductResponseDto(product, discountedCost);
 											}).collect(Collectors.toList());
 		
@@ -217,7 +216,7 @@ public class ProductSearchCriteriaServiceImpl implements ProductSearchCriteriaSe
 		// Checking the null safety for all criteria and
 		// Converting List to Set for fast lookup and maintain uniqueness. 
 		
-		Set<String> caregoriesSet = Util.safeSet(criteria.getCategories());
+		Set<String> categoriesSet = Util.safeSet(criteria.getCategories());
 		
 		Set<String> brandsSet = Util.safeSet(criteria.getBrands());
 		
@@ -243,43 +242,47 @@ public class ProductSearchCriteriaServiceImpl implements ProductSearchCriteriaSe
 		// Filtering the products based on criteria
 		
 		List<Product> filteredProduct = productsList.stream()
-				
-				.filter(product -> caregoriesSet.isEmpty() || caregoriesSet.contains(product.getCategory()))
-				
-				.filter(product -> brandsSet.isEmpty() || (product.getMetadata() != null 
-									&& brandsSet.contains(product.getMetadata().getBrand())))
-				
-				.filter(product -> colorsSet.isEmpty() || (product.getMetadata() != null 
-								    && colorsSet.contains(product.getMetadata().getColor())))
-				
-				.filter(product -> materialsSet.isEmpty() || (product.getMetadata() != null 
-									&& materialsSet.contains(product.getMetadata().getMaterial())))
-				
-				.filter(product -> tagsSet.isEmpty() || (product.getMetadata() != null 
-									&& product.getMetadata().getTags() != null 
-									&& product.getMetadata().getTags().stream()
-											.anyMatch(tag -> tagsSet.contains(tag))))
-				
-				.filter(product -> Util.sanetizePrice(minPrice) == null || (product.getMetadata() != null 
-										&& product.getMetadata().getMinPrice() >= Util.sanetizePrice(minPrice)))
-				
-				.filter(product -> Util.sanetizePrice(maxPrice) == null || (product.getMetadata() != null 
-									&& product.getMetadata().getMaxPrice() <= Util.sanetizePrice(maxPrice)))
-				
-				.filter(product -> nameKeyword == null
-									|| product.getName().toLowerCase().contains(nameKeyword.toLowerCase()))
-				
-				.filter(product -> product.getMetadata() != null 
-							&& product.getMetadata().getAdditionalAttributes() != null
-							&& attributesMap.entrySet().stream().anyMatch(entry ->{
-								
-								return  product.getMetadata().getAdditionalAttributes().containsKey(entry.getKey()) && 		
-										product.getMetadata().getAdditionalAttributes()
-											.get(entry.getKey()).equals(entry.getValue());
-							}))
-				
-				
-				.collect(Collectors.toList());
+			    .filter(product -> categoriesSet.isEmpty() || categoriesSet.contains(product.getCategory()))
+			    .filter(product -> {
+			        List<ProductMetadata> metadataList = Optional.ofNullable(product.getMetadataList())
+			            .orElse(Collections.emptyList());
+
+			        return metadataList.stream().anyMatch(metadata -> {
+			            boolean matches = true;
+
+			            if (!brandsSet.isEmpty()) {
+			                matches &= brandsSet.contains(metadata.getBrand());
+			            }
+			            if (!colorsSet.isEmpty()) {
+			                matches &= colorsSet.contains(metadata.getColor());
+			            }
+			            if (!materialsSet.isEmpty()) {
+			                matches &= materialsSet.contains(metadata.getMaterial());
+			            }
+			            if (!tagsSet.isEmpty()) {
+			                matches &= Optional.ofNullable(metadata.getTags())
+			                    .orElse(Collections.emptyList())
+			                    .stream()
+			                    .anyMatch(tagsSet::contains);
+			            }
+			            if (minPrice != null) {
+			                matches &= metadata.getMinPrice() != null && metadata.getMinPrice() >= minPrice;
+			            }
+			            if (maxPrice != null) {
+			                matches &= metadata.getMaxPrice() != null && metadata.getMaxPrice() <= maxPrice;
+			            }
+			            if (!attributesMap.isEmpty()) {
+			                Map<String, String> attrs = Optional.ofNullable(metadata.getAdditionalAttributes())
+			                    .orElse(Collections.emptyMap());
+			                matches &= attributesMap.entrySet().stream()
+			                    .allMatch(entry -> entry.getValue().equals(attrs.get(entry.getKey())));
+			            }
+
+			            return matches;
+			        });
+			    })
+			    .filter(product -> nameKeyword == null || product.getName().toLowerCase().contains(nameKeyword.toLowerCase()))
+			    .collect(Collectors.toList());
 		
 		// applying pagination manually
 		
@@ -294,7 +297,7 @@ public class ProductSearchCriteriaServiceImpl implements ProductSearchCriteriaSe
 		
 		List<ProductResponseDto> pagedDtos = pagedProducts.stream()
 				.map(product -> {
-					double discountedCost = discountService.applyDiscountByProduct(product);
+					double discountedCost = discountService.applyDiscountByProduct(product.getProductId());
 					
 					return ProductMapper.toProductResponseDto(product, discountedCost);
 				}).collect(Collectors.toList());
@@ -306,10 +309,12 @@ public class ProductSearchCriteriaServiceImpl implements ProductSearchCriteriaSe
 	// get sorted product
 
 	@Override
-	public Page<ProductResponseDto> getSortedProducts(Sort sort, Pageable pageable) {
+	public Page<ProductResponseDto> getSortedProducts(Pageable pageable) {
 		
 		// null check for sort
-		Sort safeSort = sort == null ? Sort.unsorted() : sort;
+		Sort sort = pageable.getSort();
+		
+		Sort safeSort = sort.isSorted() ? sort : sort.unsorted();
 		
 		Pageable sortedpageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), safeSort);
 		
@@ -317,7 +322,7 @@ public class ProductSearchCriteriaServiceImpl implements ProductSearchCriteriaSe
 		
 		return productPage.map(product -> {
 			
-			double discountedCost = discountService.applyDiscountByProduct(product);
+			double discountedCost = discountService.applyDiscountByProduct(product.getProductId());
 			
 			return ProductMapper.toProductResponseDto(product, discountedCost);
 		});
@@ -347,7 +352,7 @@ public class ProductSearchCriteriaServiceImpl implements ProductSearchCriteriaSe
 		List<ProductResponseDto> dtoList = similarProducts.stream()
 									.map(product ->{
 												
-									double discountedCost = discountService.applyDiscountByProduct(product);
+									double discountedCost = discountService.applyDiscountByProduct(product.getProductId());
 									
 									return ProductMapper.toProductResponseDto(product, discountedCost);
 								}).collect(Collectors.toList());

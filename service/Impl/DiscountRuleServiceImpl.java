@@ -3,11 +3,13 @@ package risrchanish.product.recommend.service.Impl;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.util.Streamable;
 import org.springframework.stereotype.Service;
 
 import risrchanish.product.recommend.dto.discountrule.DiscountRuleCreateDto;
@@ -27,14 +29,16 @@ import risrchanish.product.recommend.service.DiscountRuleService;
 public class DiscountRuleServiceImpl implements DiscountRuleService{
 
 	private DiscountRuleRepository ruleRepository;
-	
 	private ProductRepository productRepository;
+	
 	
 	DiscountRuleServiceImpl(DiscountRuleRepository ruleRepository, ProductRepository productRepository)
 	{
 		this.ruleRepository = ruleRepository;
 		this.productRepository = productRepository;
 	}
+	
+	// Creating discount rule
 	
 	@Override
 	public DiscountRuleResponseDto createDiscountRule(DiscountRuleCreateDto dto) {
@@ -62,7 +66,7 @@ public class DiscountRuleServiceImpl implements DiscountRuleService{
 	}
 
 	@Override
-	public DiscountRuleResponseDto updateDiscountRule(DiscountRuleUpdateDto dto) {
+	public DiscountRuleResponseDto updateDiscountRule(Long discountId,  DiscountRuleUpdateDto dto) {
 		
 		Product product = null;
 		
@@ -72,7 +76,12 @@ public class DiscountRuleServiceImpl implements DiscountRuleService{
 					.orElseThrow(() -> new ResourceNotFoundException("Product is not available"));
 		}
 		
-		DiscountRule rule = ruleRepository.findById(dto.getDiscountId())
+		if(discountId == null)
+		{
+			throw new IllegalArgumentException("Discount Id must not be null");
+		}
+		
+		DiscountRule rule = ruleRepository.findById(discountId)
 							.orElseThrow(() -> new ResourceNotFoundException("Discount rule not available"));
 		
 		rule = DiscountRuleMapper.updateDiscountRuleFromDto(dto, rule, product);
@@ -130,7 +139,16 @@ public class DiscountRuleServiceImpl implements DiscountRuleService{
 	}
 
 	@Override
-	public Double applyDiscountByProduct(Product product) {
+	public Double applyDiscountByProduct(Long productId) 
+	{
+		
+		if(productId == null)
+		{
+			throw new IllegalArgumentException("Product Id must not be null");
+		}
+		
+	 Product product = productRepository.findById(productId)
+					.orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 		
 		LocalDate today = LocalDate.now();
 		
@@ -166,27 +184,33 @@ public class DiscountRuleServiceImpl implements DiscountRuleService{
 		
 		DiscountRule bestRule = null;
 		
-		List<String> tags = product.getMetadata().getTags();
+		// Using flat map instead of map for double layer List of List.
 		
-		if(tags == null || tags.isEmpty())
-		{
-			throw new ResourceNotFoundException("Tags are not available for discount. Create Tag from ProductMetadata");
-		}
+		List<String> tagList = Optional.ofNullable(product.getMetadataList()).orElse(Collections.emptyList())
+								.stream().flatMap(metadata -> Optional.ofNullable(metadata.getTags())
+										.orElse(Collections.emptyList()).stream())
+											.collect(Collectors.toList());
+															
 		
-		for(String tag : tags)
+		if(!tagList.isEmpty())
 		{
-			Page<DiscountRule> tagRules = ruleRepository.findByTag(tag, Pageable.unpaged());
-			
-			Optional<DiscountRule> validTagRules = tagRules.stream()
-													.filter(rule -> isValid(rule,today)).findFirst();
-			if(validTagRules.isPresent())
+			for(String tag : tagList)
 			{
-				if(bestRule == null || validTagRules.get().getValue() > bestRule.getValue())
+				Page<DiscountRule> tagRules = ruleRepository.findByTag(tag, Pageable.unpaged());
+				
+				Optional<DiscountRule> validTagRules = tagRules.stream()
+														.filter(rule -> isValid(rule,today)).findFirst();
+				if(validTagRules.isPresent())
 				{
-					bestRule = validTagRules.get();
+					if(bestRule == null || validTagRules.get().getValue() > bestRule.getValue())
+					{
+						bestRule = validTagRules.get();
+					}
 				}
 			}
 		}
+		
+		
 		
 		if(bestRule != null)
 		{
@@ -196,9 +220,17 @@ public class DiscountRuleServiceImpl implements DiscountRuleService{
 		
 		// Brand based discount
 		
+		
+		List<String> brandList = Optional.ofNullable(product.getMetadataList()).orElse(Collections.emptyList())
+							.stream().map(metadata -> metadata.getBrand())
+							.filter(val -> Objects.nonNull(val))
+							.distinct()
+							.collect(Collectors.toList());
+							
+		
 		Page<DiscountRule> brandRules = ruleRepository
-									.findByCategoryAndBrand(product.getCategory(), 
-															product.getMetadata().getBrand(), 
+									.findByCategoryAndMetadataBrandIn(product.getCategory(), 
+															brandList, 
 															Pageable.unpaged());
 		
 		Optional<DiscountRule> validBrandRules = brandRules.stream()
@@ -212,6 +244,21 @@ public class DiscountRuleServiceImpl implements DiscountRuleService{
 		
 		return product.getPrice();
 		
+	}
+	
+	// delete discount rule by ID
+	
+	public void deleteDiscountRule(Long discountId)
+	{
+		if(discountId == null)
+		{
+			throw new IllegalArgumentException("discount Id must not be null");
+		}
+		
+		DiscountRule rule = ruleRepository.findById(discountId)
+									.orElseThrow(() -> new ResourceNotFoundException("Discount rule not found"));
+				
+		ruleRepository.delete(rule);
 	}
 	
 	
@@ -230,6 +277,7 @@ public class DiscountRuleServiceImpl implements DiscountRuleService{
 	    }
 	    return originalPrice;
 	}
+	
 	
 	
 

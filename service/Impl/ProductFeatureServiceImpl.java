@@ -1,10 +1,8 @@
 package risrchanish.product.recommend.service.Impl;
 
 import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +13,7 @@ import risrchanish.product.recommend.dto.productfeature.ProductFeatureResponseDt
 import risrchanish.product.recommend.dto.productfeature.ProductFeatureUpdateDto;
 import risrchanish.product.recommend.entity.Product;
 import risrchanish.product.recommend.entity.ProductFeature;
+import risrchanish.product.recommend.exception.DuplicateFeatureVectorException;
 import risrchanish.product.recommend.exception.ResourceNotFoundException;
 import risrchanish.product.recommend.mapper.ProductFeatureMapper;
 import risrchanish.product.recommend.repository.ProductFeatureRepository;
@@ -40,6 +39,13 @@ public class ProductFeatureServiceImpl implements ProductFeatureService{
 		
 		Product product = productRepository.findById(dto.getProductId())
 							.orElseThrow(() -> new ResourceNotFoundException("Product not found"));
+		
+		// checking for existing feature vector. There must be only one feature vector list for single product.
+		
+		boolean exists = productFeatureRepository.existsByProduct_ProductId(dto.getProductId());
+		if (exists) {
+		    throw new DuplicateFeatureVectorException("Feature vector already exists for productId: " + dto.getProductId());
+		}
 		
 		ProductFeature feature = ProductFeatureMapper.toProductFeature(dto, product);
 		
@@ -108,26 +114,7 @@ public class ProductFeatureServiceImpl implements ProductFeatureService{
 		
 	}
 
-	@Override
-	public Page<ProductFeatureResponseDto> getAllProductFeaturesByProductId(Long productId, Pageable pageable) {
-		
-		if(productId == null)
-		{
-			throw new IllegalArgumentException("Product Id not found");
-		}
-		
-		Page<ProductFeature> features = productFeatureRepository.findByProduct_ProductId(productId, pageable);
-		
-		if(features.isEmpty())
-		{
-			return Page.empty(pageable);
-		}
-		
-		return features.map(feature -> 	new ProductFeatureResponseDto(feature.getFeatureId(),
-												feature.getProduct().getProductId(),
-												Optional.ofNullable(feature.getFeatureVector())
-												.orElse(Collections.emptyList())));
-	}
+
 
 	// getting all product features
 	

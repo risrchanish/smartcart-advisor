@@ -66,7 +66,7 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public Page<UserResponseDto> getUsersByName(String name, Pageable pageable) {
 		
-		Page<User> users = userRepository.findByName(name, pageable);
+		Page<User> users = userRepository.findByNameContainingIgnoreCase(name, pageable);
 		
 		Page<UserResponseDto> userDto = users.map(user -> UserMapper.toResponseDto(user));
 		
@@ -78,7 +78,7 @@ public class UserServiceImpl implements UserService{
 	@Override
 	public Page<UserResponseDto> getUsersByLocation(String location, Pageable pageable) {
 		
-		Page<User> users = userRepository.findByLocation(location, pageable);
+		Page<User> users = userRepository.findByLocationContainingIgnoreCase(location, pageable);
 		
 		Page<UserResponseDto> userDto = users.map(user -> UserMapper.toResponseDto(user));
 		
@@ -139,6 +139,11 @@ public class UserServiceImpl implements UserService{
 	// Update User
 	@Override
 	public UserResponseDto updateUser(Long userId, UserUpdateDto dto) {
+		
+		if(userId == null)
+		{
+			throw new IllegalArgumentException("User Id must not be null");
+		}
 		
 		Optional<User> userOptional = userRepository.findById(userId);
 		

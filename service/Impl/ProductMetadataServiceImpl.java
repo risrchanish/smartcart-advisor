@@ -1,7 +1,14 @@
 package risrchanish.product.recommend.service.Impl;
 
 
+import java.awt.event.FocusEvent.Cause;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,6 +19,7 @@ import risrchanish.product.recommend.dto.productmetadata.ProductMetadataResponse
 import risrchanish.product.recommend.dto.productmetadata.ProductMetadataUpdateDto;
 import risrchanish.product.recommend.entity.Product;
 import risrchanish.product.recommend.entity.ProductMetadata;
+import risrchanish.product.recommend.exception.DuplicateMetadataException;
 import risrchanish.product.recommend.exception.ResourceNotFoundException;
 import risrchanish.product.recommend.mapper.ProductMetadataMapper;
 import risrchanish.product.recommend.repository.ProductMetadataRepository;
@@ -42,6 +50,30 @@ public class ProductMetadataServiceImpl implements ProductMetadataService{
 			throw new IllegalArgumentException("Product must not be null");
 		}
 		
+		if(productMetadataRepository.existsByproduct_ProductId(dto.getProductId()))
+		{
+			throw new DuplicateMetadataException
+					("Product Metadata already exists for productId: "+dto.getProductId());
+			
+		}
+		
+		/*
+		 * Written logic below for the above db check.
+		
+		List<ProductMetadata> metadataList = productMetadataRepository.findAll(); // this is O(n)
+
+		
+		 // O(n) fetch and scan — acceptable for small data sets, but we have to consider DB-level check for scale
+		
+		boolean exists = metadataList.stream()
+				.anyMatch(metadata -> metadata.getProduct().getProductId().equals(dto.getProductId())); 
+
+		if(exists)
+		{
+			throw new IllegalArgumentException("Product Metadata already exists for productId: "+dto.getProductId());
+		}	
+		
+	*/
 		Product product = productRepository.findById(dto.getProductId())
 								.orElseThrow(() -> new ResourceNotFoundException("Product is not available"));
 		
@@ -49,9 +81,9 @@ public class ProductMetadataServiceImpl implements ProductMetadataService{
 		
 		productMetadataRepository.save(metadata);
 		
-		return ProductMetadataMapper.toMetadataResponseDto(metadata);
-		
-		
+		return ProductMetadataMapper.toMetadataResponseDto(metadata);	
+
+
 	}
 	
 	// Update Product Metadata 
@@ -105,6 +137,7 @@ public class ProductMetadataServiceImpl implements ProductMetadataService{
 		}
 		
 		Page<ProductMetadata> metadatas = productMetadataRepository.findByBrandContainingIgnoreCase(brand, pageable);
+		
 		
 		if(metadatas.isEmpty())
 		{

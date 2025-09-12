@@ -1,6 +1,9 @@
 package risrchanish.product.recommend.service.Impl;
 
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -51,6 +54,24 @@ public class RatingServiceImpl implements RatingService{
 		
 		return RatingMapper.toRatingResponseDto(rating);
 	}
+	
+	// Get rating by Id
+
+	@Override
+	public RatingResponseDto getRatingById(Long ratingId) {
+		
+		if(ratingId == null)
+		{
+			throw new IllegalArgumentException("Rating Id must not be null");
+		}
+		
+		Rating rating = ratingRepository.findById(ratingId)
+							.orElseThrow(() -> new ResourceNotFoundException("rating not found"));
+		
+		return RatingMapper.toRatingResponseDto(rating);
+	}
+
+	// get rating by product Id
 
 	@Override
 	public Page<RatingResponseDto> getRatingsByProduct(Long productId, Pageable pageable) {
@@ -60,7 +81,7 @@ public class RatingServiceImpl implements RatingService{
 			throw new IllegalArgumentException("Product is not available");
 		}
 		
-		Page<Rating> ratings = ratingRepository.findByProductId(productId, pageable);
+		Page<Rating> ratings = ratingRepository.findByProduct_ProductId(productId, pageable);
 		
 		if(ratings.isEmpty())
 		{
@@ -69,6 +90,9 @@ public class RatingServiceImpl implements RatingService{
 		
 		return ratings.map(rating -> RatingMapper.toRatingResponseDto(rating));
 	}
+	
+	
+	// get rating by User 
 
 	@Override
 	public Page<RatingResponseDto> getRatingsByUser(Long userId, Pageable pageable) {
@@ -78,7 +102,7 @@ public class RatingServiceImpl implements RatingService{
 			throw new IllegalArgumentException("User is not available");
 		}
 		
-		Page<Rating> ratings = ratingRepository.findByUserId(userId, pageable);
+		Page<Rating> ratings = ratingRepository.findByUser_UserId(userId, pageable);
 		
 		if(ratings.isEmpty())
 		{
@@ -88,36 +112,71 @@ public class RatingServiceImpl implements RatingService{
 		return ratings.map(rating -> RatingMapper.toRatingResponseDto(rating));
 	}
 
+	
+	// Updating the rating 
 
 	@Override
-	public RatingResponseDto updateRatingByProductId(Long productId, RatingUpdateDto dto) {
+	public RatingResponseDto updateRating(Long productId, Long userId, RatingUpdateDto dto) {
 		
-		Rating rating = ratingRepository.findById(productId).orElse(null);
-		
-		if(rating == null)
+		if(userId == null || productId == null)
 		{
-			throw new ResourceNotFoundException("Rating not available");
+			throw new IllegalArgumentException("User and Product Ids must not be null to update a Rating");
 		}
 		
-		Rating updatedRating = RatingMapper.updateRatingFromDto(rating, dto);
+		Rating rating = ratingRepository.findById(dto.getRatingId())
+							.orElseThrow(() -> new ResourceNotFoundException("Rating not found"));
 		
-		ratingRepository.save(updatedRating);
+		if(!rating.getUser().getUserId().equals(userId)  || !rating.getProduct().getProductId().equals(productId))
+		{
+			throw new IllegalArgumentException("User Id or Product Id does not belongs to same rating");
+		}
 		
-		return RatingMapper.toRatingResponseDto(updatedRating);
+		
+		rating.setRating(dto.getRating());
+		rating.setReviewText(dto.getReviewText());
+		rating.setTimestamp(dto.getTimestamp());
+		rating.setVerified(dto.isVerified());
+		
+		ratingRepository.save(rating);
+		
+		return RatingMapper.toRatingResponseDto(rating);
 	}
 
+	// Deleting a rating
+
 	@Override
-	public void deleteRating(Long ratingId) {
+	public void deleteRating(Long ratingId, Long userId, Long productId) {
 		
-		Rating rating = ratingRepository.findById(ratingId).orElse(null);
-		
-		if(rating == null)
+		if(ratingId == null || userId == null || productId == null)
 		{
-			throw new ResourceNotFoundException("rating is not available");
+			throw new IllegalArgumentException("For deleting a rating User, Rating and Product Ids must not be null");
+		}
+		
+		Rating rating = ratingRepository.findById(ratingId)
+							.orElseThrow(() -> new ResourceNotFoundException("Rating not found"));
+		
+		if(!rating.getUser().getUserId().equals(userId) || !rating.getProduct().getProductId().equals(productId))
+		{
+			throw new IllegalArgumentException("User Id and Product Id does not belong to same rating");
 		}
 		
 		ratingRepository.delete(rating);
 		
+	}
+
+	// Find all ratings
+
+	@Override
+	public Page<RatingResponseDto> getAllRatings(Pageable pageable) {
+		
+		Page<Rating> ratings = ratingRepository.findAll(pageable);
+		
+		if(ratings.isEmpty())
+		{
+			return Page.empty(pageable);
+		}
+		
+		return ratings.map(rating -> RatingMapper.toRatingResponseDto(rating));
 	}
 
 }

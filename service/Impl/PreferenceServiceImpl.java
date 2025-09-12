@@ -44,12 +44,19 @@ public class PreferenceServiceImpl implements PreferenceService{
 	@Override
 	public PreferenceResponseDto updatePreference(Long preferenceId, PreferenceUpdateDto dto) {
 		
+		if(preferenceId == null)
+		{
+			throw new IllegalArgumentException("Preference Id must not be null");
+		}
+		
 		Preference preference = preferenceRepository.findById(preferenceId)
 									.orElseThrow(() -> new ResourceNotFoundException("Preference not found"));
 		
-		preference.setName(dto.getName());
+		Preference updatedPreference = PreferenceMapper.toEntity(preference, dto);
 		
-		return PreferenceMapper.toDto(preference);
+		preferenceRepository.save(updatedPreference);
+		
+		return PreferenceMapper.toDto(updatedPreference);
 	}
 
 	@Override
@@ -119,6 +126,21 @@ public class PreferenceServiceImpl implements PreferenceService{
 		
 		preferenceRepository.delete(preference);
 		
+	}
+	
+	// Get all preferences
+
+	@Override
+	public Page<PreferenceResponseDto> getAllPreferences(Pageable pageable) {
+		
+		Page<Preference> preferences = preferenceRepository.findAll(pageable);
+		
+		if(preferences.isEmpty())
+		{
+			return Page.empty(pageable);
+		}
+		
+		return preferences.map(preference -> PreferenceMapper.toDto(preference));
 	}
 	
 

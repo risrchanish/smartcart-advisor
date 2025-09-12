@@ -9,7 +9,7 @@ public record RatingResponseDto(
 		 Long productId,
 		 double rating,
 		 String reviewText,
-		 boolean isVerified,
+		 boolean verified,
 		 LocalDateTime timestamp
 		
 		

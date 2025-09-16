@@ -15,7 +15,9 @@ It deliver intelligent product recommendations using collaborative filtering and
 
   - Client (Frontend or API Consumer)
      
-  - REST Controller (Spring Boot) 
+  - REST Controller (Spring Boot)
+
+  - DTO Layer(Request/Response Models)
      
   - Service Layer (Advisor Logic) 
   
